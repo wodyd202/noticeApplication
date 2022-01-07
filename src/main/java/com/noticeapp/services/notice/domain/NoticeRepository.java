@@ -1,7 +1,8 @@
 package com.noticeapp.services.notice.domain;
 
-import com.noticeapp.services.notice.domain.Notice;
+import java.util.Optional;
 
 public interface NoticeRepository {
     void save(Notice notice);
+    Optional<Notice> findById(long noticeId);
 }

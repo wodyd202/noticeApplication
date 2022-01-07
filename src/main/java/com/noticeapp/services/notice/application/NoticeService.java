@@ -1,13 +1,11 @@
 package com.noticeapp.services.notice.application;
 
-import com.noticeapp.services.notice.domain.Notice;
-import com.noticeapp.services.notice.domain.NoticeFile;
-import com.noticeapp.services.notice.domain.NoticeRepository;
-import com.noticeapp.services.notice.domain.Writer;
+import com.noticeapp.services.notice.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +23,7 @@ public class NoticeService {
         Notice notice = noticeFactory.createBy(writer, registerNotice);
         noticeRepository.save(notice);
         if(registerNotice.hasFiles()){
-            List<NoticeFile> noticeFiles = registerNotice.getFiles().stream()
-                    .map(file->NoticeFile.of(notice, file, file.getOriginalFilename()))
-                    .collect(Collectors.toList());
-            notice.addFiles(noticeFiles);
-
-            publishSavedNoticeFileEvent(notice, noticeFiles);
+            addFiles(writer, registerNotice.getFiles(), notice);
         }
         return NoticeModel.mapFrom(notice);
     }
@@ -40,5 +33,56 @@ public class NoticeService {
                 .map(file -> SaveNoticeFile.of(notice.getId(), file.getPath(), file.getFile()))
                 .collect(Collectors.toList());
         applicationEventPublisher.publishEvent(new SavedNoticeFileEvent(savedNoticeFiles));
+    }
+
+    public NoticeModel update(Writer writer, long noticeId, UpdateNotice updateNotice) {
+        Notice notice = getNotice(noticeId);
+
+        boolean isTitleChange = false;
+        boolean isContentChange = false;
+        boolean isNoticeDateChange = false;
+
+        if(updateNotice.getTitle() != null){
+            isTitleChange = notice.updateTitle(writer, updateNotice.getTitle());
+        }
+
+        if(updateNotice.getContent() != null){
+            isContentChange = notice.updateContent(writer, updateNotice.getContent());
+        }
+
+        if(updateNotice.getStartDate() != null && updateNotice.getEndDate() != null){
+            isNoticeDateChange = notice.updateNoticeDate(writer, NoticeDate.of(updateNotice.getStartDate(), updateNotice.getEndDate()));
+        }
+
+        if(!isTitleChange && !isContentChange && !isNoticeDateChange){
+            throw new NoEditNoticeException();
+        }
+
+        return NoticeModel.mapFrom(notice);
+    }
+
+    public void addFiles(Writer writer, long noticeId, List<MultipartFile> file) {
+        Notice notice = getNotice(noticeId);
+
+        addFiles(writer, file, notice);
+    }
+
+    private void addFiles(Writer writer, List<MultipartFile> file, Notice notice) {
+        List<NoticeFile> noticeFiles = file.stream()
+                .map(multipartFile -> NoticeFile.of(notice, multipartFile, multipartFile.getOriginalFilename()))
+                .collect(Collectors.toList());
+        notice.addFiles(writer, noticeFiles);
+        publishSavedNoticeFileEvent(notice, noticeFiles);
+    }
+
+    private Notice getNotice(long noticeId) {
+        return noticeRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
+    }
+
+    public void removeFile(Writer writer, long noticeId, long fileId) {
+        Notice notice = getNotice(noticeId);
+
+        notice.removeFile(writer, fileId);
+        applicationEventPublisher.publishEvent(new RemovedNoticeFileEvent(noticeId, fileId));
     }
 }

@@ -1,5 +1,6 @@
 package com.noticeapp.services.noticefile.application;
 
+import com.noticeapp.services.notice.application.RemovedNoticeFileEvent;
 import com.noticeapp.services.notice.application.SaveNoticeFile;
 import com.noticeapp.services.notice.application.SavedNoticeFileEvent;
 import org.springframework.context.event.EventListener;
@@ -16,5 +17,10 @@ public class NoticeFileEventListener {
     public void handle(SavedNoticeFileEvent event){
         List<SaveNoticeFile> savedNoticeFiles = event.getSavedNoticeFiles();
         System.out.println("파일 저장");
+    }
+
+    @EventListener
+    public void handle(RemovedNoticeFileEvent event){
+        System.out.println("파일 삭제");
     }
 }
