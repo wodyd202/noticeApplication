@@ -6,6 +6,7 @@ import com.noticeapp.services.notice.domain.QNotice;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class QuerydslNoticeSearchRepository implements NoticeSearchRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    @Cacheable(value = "notice", key = "#noticeId")
     public Optional<NoticeModel> findById(long noticeId) {
         return Optional.ofNullable(
                 jpaQueryFactory.select(Projections.constructor(NoticeModel.class,
