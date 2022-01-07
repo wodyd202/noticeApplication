@@ -59,6 +59,13 @@ public class NoticeContoller {
         noticeService.removeFile(createWriterFrom(user), noticeId, fileId);
     }
 
+    @DeleteMapping("/{noticeId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeNotice(User user,
+                             @PathVariable long noticeId){
+        noticeService.remove(createWriterFrom(user), noticeId);
+    }
+
     private Writer createWriterFrom(User user){
         return Writer.of(user.getIdentifier());
     }

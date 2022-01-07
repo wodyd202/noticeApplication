@@ -305,6 +305,28 @@ public class NoticeController_Test {
                 .header(AUTHENTICATION, updater));
     }
 
+    @Test
+    @DisplayName("공지사항 삭제")
+    void removeNotice() throws Exception {
+        // given
+        NoticeDate noticeDate = NoticeDate.of(LocalDate.now(), LocalDate.now());
+        Notice notice = saveNotce(Notice.of("제목", "내용", Writer.of("user"), noticeDate));
+
+        // when
+        String remover = "user";
+        long noticeId = notice.getId();
+        assertRemoveNotice(remover, noticeId)
+
+        // then
+        .andExpect(status().isNoContent());
+    }
+
+    private final String REMOVE_NOTICE_URI = "/api/notice/{noticeId}";
+    private ResultActions assertRemoveNotice(String remover, long noticeId) throws Exception{
+        return mockMvc.perform(delete(REMOVE_NOTICE_URI, noticeId)
+                .header(AUTHENTICATION, remover));
+    }
+
     private Notice saveNotce(Notice notice){
         noticeRepository.save(notice);
         return notice;

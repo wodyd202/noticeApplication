@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -41,6 +42,10 @@ public class Notice {
 
     @CreatedDate
     private LocalDate createDate;
+    @LastModifiedDate
+    private LocalDate lastModifiDate;
+    private LocalDate deleteDate;
+    private boolean isDelete;
 
     private Notice(String title, String content, Writer writer, NoticeDate noticeDate) {
         this.title = title;
@@ -104,5 +109,11 @@ public class Notice {
 
     private boolean hasUpdatePermission(Writer updater) {
         return this.writer.equals(updater);
+    }
+
+    public void remove(Writer remover) {
+        verifyHasUpdatePermission(remover);
+        isDelete = true;
+        deleteDate = LocalDate.now();
     }
 }

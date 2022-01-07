@@ -1,5 +1,6 @@
 package com.noticeapp.services.noticefile.application;
 
+import com.noticeapp.services.notice.application.RemovedNoticeEvent;
 import com.noticeapp.services.notice.application.RemovedNoticeFileEvent;
 import com.noticeapp.services.notice.application.SaveNoticeFile;
 import com.noticeapp.services.notice.application.SavedNoticeFileEvent;
@@ -22,5 +23,10 @@ public class NoticeFileEventListener {
     @EventListener
     public void handle(RemovedNoticeFileEvent event){
         System.out.println("파일 삭제");
+    }
+
+    @EventListener
+    public void handle(RemovedNoticeEvent event){
+        System.out.println("공지사항 삭제로 인한 파일 삭제");
     }
 }
