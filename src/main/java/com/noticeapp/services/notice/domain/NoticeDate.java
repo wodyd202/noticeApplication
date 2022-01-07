@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Getter
 @Embeddable
@@ -24,5 +25,18 @@ public class NoticeDate {
 
     public static NoticeDate of(LocalDate startDate, LocalDate endDate){
         return new NoticeDate(startDate, endDate);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NoticeDate that = (NoticeDate) o;
+        return Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startDate, endDate);
     }
 }
