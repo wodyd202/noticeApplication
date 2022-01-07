@@ -1,9 +1,9 @@
 package com.noticeapp.services.noticefile.application;
 
-import com.noticeapp.services.notice.application.RemovedNoticeEvent;
-import com.noticeapp.services.notice.application.RemovedNoticeFileEvent;
-import com.noticeapp.services.notice.application.SaveNoticeFile;
-import com.noticeapp.services.notice.application.SavedNoticeFileEvent;
+import com.noticeapp.services.notice.application.event.RemovedNoticeEvent;
+import com.noticeapp.services.notice.application.event.RemovedNoticeFileEvent;
+import com.noticeapp.services.notice.application.event.SaveNoticeFile;
+import com.noticeapp.services.notice.application.event.SavedNoticeFileEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;

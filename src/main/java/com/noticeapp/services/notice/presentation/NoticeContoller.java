@@ -1,6 +1,7 @@
 package com.noticeapp.services.notice.presentation;
 
-import com.noticeapp.services.notice.application.NoticeModel;
+import com.noticeapp.services.notice.application.model.NoticeModel;
+import com.noticeapp.services.notice.application.model.NoticeResponse;
 import com.noticeapp.services.notice.application.NoticeService;
 import com.noticeapp.services.notice.domain.Writer;
 import com.noticeapp.web.InvalidRequestException;
@@ -20,6 +21,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeContoller {
     private final NoticeService noticeService;
+
+    @GetMapping("{noticeId}")
+    public ResponseEntity<NoticeResponse> getNotice(@PathVariable long noticeId){
+        NoticeResponse noticeResponse = noticeService.getNoticeResponse(noticeId);
+        return ResponseEntity.ok(noticeResponse);
+    }
 
     @PostMapping
     public ResponseEntity<NoticeModel> register(User user,

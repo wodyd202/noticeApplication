@@ -1,4 +1,4 @@
-package com.noticeapp.services.notice.application;
+package com.noticeapp.services.notice.application.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

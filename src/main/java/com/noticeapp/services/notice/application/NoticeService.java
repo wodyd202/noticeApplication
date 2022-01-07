@@ -1,5 +1,11 @@
 package com.noticeapp.services.notice.application;
 
+import com.noticeapp.services.notice.application.event.*;
+import com.noticeapp.services.notice.application.external.NoticeHitRepository;
+import com.noticeapp.services.notice.application.model.NoticeModel;
+import com.noticeapp.services.notice.application.model.NoticeResponse;
+import com.noticeapp.services.notice.application.model.RegisterNotice;
+import com.noticeapp.services.notice.application.model.UpdateNotice;
 import com.noticeapp.services.notice.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,8 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final NoticeFactory noticeFactory;
@@ -21,11 +27,19 @@ public class NoticeService {
 
     public NoticeModel register(Writer writer, RegisterNotice registerNotice) {
         Notice notice = noticeFactory.createBy(writer, registerNotice);
-        noticeRepository.save(notice);
         if(registerNotice.hasFiles()){
             addFiles(writer, registerNotice.getFiles(), notice);
         }
+        noticeRepository.save(notice);
         return NoticeModel.mapFrom(notice);
+    }
+
+    private void addFiles(Writer writer, List<MultipartFile> file, Notice notice) {
+        List<NoticeFile> noticeFiles = file.stream()
+                .map(multipartFile -> NoticeFile.of(notice, multipartFile, multipartFile.getOriginalFilename()))
+                .collect(Collectors.toList());
+        notice.addFiles(writer, noticeFiles);
+        publishSavedNoticeFileEvent(notice, noticeFiles);
     }
 
     private void publishSavedNoticeFileEvent(Notice notice, List<NoticeFile> noticeFiles) {
@@ -67,14 +81,6 @@ public class NoticeService {
         addFiles(writer, file, notice);
     }
 
-    private void addFiles(Writer writer, List<MultipartFile> file, Notice notice) {
-        List<NoticeFile> noticeFiles = file.stream()
-                .map(multipartFile -> NoticeFile.of(notice, multipartFile, multipartFile.getOriginalFilename()))
-                .collect(Collectors.toList());
-        notice.addFiles(writer, noticeFiles);
-        publishSavedNoticeFileEvent(notice, noticeFiles);
-    }
-
     public void removeFile(Writer updater, long noticeId, long fileId) {
         Notice notice = getNotice(noticeId);
 
@@ -93,4 +99,18 @@ public class NoticeService {
         return noticeRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
     }
 
+    // query
+
+    private final NoticeSearchRepository noticeSearchRepository;
+
+    // external
+    private final NoticeHitRepository noticeHitRepository;
+
+    public NoticeResponse getNoticeResponse(long noticeId) {
+        NoticeModel noticeModel = noticeSearchRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
+        long totalHit = noticeHitRepository.getNoticeHit(noticeId);
+
+        applicationEventPublisher.publishEvent(new ReadNoticeEvent(noticeId));
+        return NoticeResponse.of(noticeModel, totalHit);
+    }
 }
