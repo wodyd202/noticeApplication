@@ -75,14 +75,22 @@ public class NoticeService {
         publishSavedNoticeFileEvent(notice, noticeFiles);
     }
 
+    public void removeFile(Writer updater, long noticeId, long fileId) {
+        Notice notice = getNotice(noticeId);
+
+        notice.removeFile(updater, fileId);
+        applicationEventPublisher.publishEvent(new RemovedNoticeFileEvent(noticeId, fileId));
+    }
+
+    public void remove(Writer remover, long noticeId) {
+        Notice notice = getNotice(noticeId);
+
+        notice.remove(remover);
+        applicationEventPublisher.publishEvent(new RemovedNoticeEvent(noticeId));
+    }
+
     private Notice getNotice(long noticeId) {
         return noticeRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
     }
 
-    public void removeFile(Writer writer, long noticeId, long fileId) {
-        Notice notice = getNotice(noticeId);
-
-        notice.removeFile(writer, fileId);
-        applicationEventPublisher.publishEvent(new RemovedNoticeFileEvent(noticeId, fileId));
-    }
 }
