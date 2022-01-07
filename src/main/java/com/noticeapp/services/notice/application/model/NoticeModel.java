@@ -6,13 +6,16 @@ import com.noticeapp.services.notice.domain.NoticeFile;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class NoticeModel {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class NoticeModel implements Serializable {
     private long id;
     private String title;
     private String content;

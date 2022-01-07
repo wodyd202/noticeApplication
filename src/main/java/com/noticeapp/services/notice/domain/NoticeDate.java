@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class NoticeDate {
+public class NoticeDate implements Serializable {
     private LocalDate startDate;
     private LocalDate endDate;
 

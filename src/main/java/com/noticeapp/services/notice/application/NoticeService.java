@@ -8,6 +8,8 @@ import com.noticeapp.services.notice.application.model.RegisterNotice;
 import com.noticeapp.services.notice.application.model.UpdateNotice;
 import com.noticeapp.services.notice.domain.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,7 @@ public class NoticeService {
         applicationEventPublisher.publishEvent(new SavedNoticeFileEvent(savedNoticeFiles));
     }
 
+    @CacheEvict(value = "notice", key = "#noticeId")
     public NoticeModel update(Writer writer, long noticeId, UpdateNotice updateNotice) {
         Notice notice = getNotice(noticeId);
 
@@ -88,6 +91,7 @@ public class NoticeService {
         applicationEventPublisher.publishEvent(new RemovedNoticeFileEvent(noticeId, fileId));
     }
 
+    @CacheEvict(value = "notice", key = "#noticeId")
     public void remove(Writer remover, long noticeId) {
         Notice notice = getNotice(noticeId);
 
