@@ -327,6 +327,21 @@ public class NoticeController_Test {
                 .header(AUTHENTICATION, remover));
     }
 
+    @Test
+    @DisplayName("공지사항 리스트 조회")
+    void getNotices() throws Exception {
+        // given
+        NoticeDate noticeDate = NoticeDate.of(LocalDate.now(), LocalDate.now());
+        Notice notice = saveNotce(Notice.of("제목", "내용", Writer.of("user"), noticeDate));
+
+        // when
+        long noticeId = notice.getId();
+        mockMvc.perform(get("/api/notice/{noticeId}", noticeId))
+
+        // then
+        .andExpect(status().isOk());
+    }
+
     private Notice saveNotce(Notice notice){
         noticeRepository.save(notice);
         return notice;

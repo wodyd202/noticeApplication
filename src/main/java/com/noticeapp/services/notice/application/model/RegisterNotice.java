@@ -1,4 +1,4 @@
-package com.noticeapp.services.notice.application;
+package com.noticeapp.services.notice.application.model;
 
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;

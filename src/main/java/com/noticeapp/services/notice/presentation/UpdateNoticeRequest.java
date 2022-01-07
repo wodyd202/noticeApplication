@@ -1,8 +1,7 @@
 package com.noticeapp.services.notice.presentation;
 
-import com.noticeapp.services.notice.application.UpdateNotice;
+import com.noticeapp.services.notice.application.model.UpdateNotice;
 import lombok.*;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 
