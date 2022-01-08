@@ -1,7 +1,6 @@
 package com.noticeapp.services.notice.application;
 
 import com.noticeapp.services.notice.application.event.*;
-import com.noticeapp.services.notice.application.external.NoticeHitRepository;
 import com.noticeapp.services.notice.application.model.NoticeModel;
 import com.noticeapp.services.notice.application.model.NoticeResponse;
 import com.noticeapp.services.notice.application.model.RegisterNotice;
@@ -9,7 +8,6 @@ import com.noticeapp.services.notice.application.model.UpdateNotice;
 import com.noticeapp.services.notice.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,7 +110,7 @@ public class NoticeService {
 
     public NoticeResponse getNoticeResponse(long noticeId) {
         NoticeModel noticeModel = noticeSearchRepository.findById(noticeId).orElseThrow(NoticeNotFoundException::new);
-        long totalHit = noticeHitRepository.getNoticeHit(noticeId);
+        long totalHit = noticeHitRepository.incrementHit(noticeId);
 
         applicationEventPublisher.publishEvent(new ReadNoticeEvent(noticeId));
         return NoticeResponse.of(noticeModel, totalHit);
