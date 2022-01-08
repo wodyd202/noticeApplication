@@ -22,7 +22,6 @@ public class QuerydslNoticeSearchRepository implements NoticeSearchRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    @Cacheable(value = "notice", key = "#noticeId")
     public Optional<NoticeModel> findById(long noticeId) {
         return Optional.ofNullable(
                 jpaQueryFactory.select(Projections.constructor(NoticeModel.class,
