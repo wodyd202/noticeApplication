@@ -1,6 +1,6 @@
-package com.noticeapp.services.notice.infrastructure.external;
+package com.noticeapp.services.notice.infrastructure;
 
-import com.noticeapp.services.notice.application.external.NoticeHitRepository;
+import com.noticeapp.services.notice.application.NoticeHitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -20,12 +20,7 @@ public class NoticeHitRepositoryForNotice implements NoticeHitRepository {
     }
 
     @Override
-    public long getNoticeHit(long noticeId) {
-        Object obj = valueOperations.get(noticeId);
-        if(obj == null){
-            valueOperations.set(noticeId, 1L);
-            return 1;
-        }
-        return Long.parseLong(valueOperations.get(noticeId).toString());
+    public long incrementHit(long noticeId) {
+        return valueOperations.increment(noticeId);
     }
 }
